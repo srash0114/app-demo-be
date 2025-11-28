@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, Patch, Param } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/user/entities/user.entity';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 
 @Controller('todo')
 @UseGuards(AuthGuard('jwt'))
@@ -19,4 +19,8 @@ export class TodoController {
     return this.todoService.findAll(req.user.userId);
   }
 
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto, @Request() req) {
+    return this.todoService.setDone(+id, updateTodoDto.isDone, req.user.userId);
+  }
 }

@@ -20,4 +20,13 @@ export class TodoService {
   findAll(userId: number): Promise<Todo[]> {
     return this.todoRepository.find({ where: { UserId: userId }, order: { id: 'DESC' } });
   }
+
+  async setDone(id: number, isDone: boolean, userId: number): Promise<Todo> {
+    const todo = await this.todoRepository.findOne({ where: { id, UserId: userId }});
+    if (!todo) {
+      throw new Error('Todo not found');
+    }
+    todo.isDone = isDone;
+    return this.todoRepository.save(todo);
+  }
 }
