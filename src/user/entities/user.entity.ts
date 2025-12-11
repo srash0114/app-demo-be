@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Todo } from 'src/todo/entities/todo.entity';
+import  { Order } from '../../orders/entities/order.entity';
 
 @Entity()
 export class User {
@@ -24,4 +25,7 @@ export class User {
 
     @OneToMany(() => Todo, (todo) => todo.UserId)
     todos: Todo[];
+
+    @OneToMany(() => Order, (order) => order.user)
+    orders: Order[];
 }
