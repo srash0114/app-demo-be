@@ -15,6 +15,7 @@ import { Category } from './categories/entities/category.entity';
 import { CartModule } from './cart/cart.module';
 import { Cart } from './cart/entities/cart.entity';
 import { CartItem } from './cart/entities/cart-item.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -29,6 +30,9 @@ import { CartItem } from './cart/entities/cart-item.entity';
     AuthModule,
     ProductsModule,
     CartModule,
+    ConfigModule.forRoot({
+      isGlobal: true, // Quan trọng: Để dùng được ConfigService ở mọi nơi (Auth, User...) mà không cần import lại
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

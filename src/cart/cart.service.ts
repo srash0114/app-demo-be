@@ -7,7 +7,7 @@ import { CartItem } from './entities/cart-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { RemoveFromCartDto } from './dto/remove-cart.dto'; 
-
+import { ForbiddenException } from '@nestjs/common';
 @Injectable()
 export class CartService {
   constructor(
@@ -71,28 +71,20 @@ export class CartService {
     return { ...cart, totalPrice };
   }
 
-  async removeFromCart(userId: string, productId: number) {
+  // Gợi ý: Đổi logic controller để nhận cartItemId
+  async removeItem(userId: string, cartItemId: number) {
+      const cartItem = await this.cartRepository.findOne({
+          where: { userId },
+          relations: ['items', 'items.product', 'items.cart'],
+      });
 
-    const cart = await this.cartRepository.findOne({
-      where: { userId },
-      relations: ['items', 'items.product'],
-    });
+      if (!cartItem) throw new NotFoundException('Mục không tồn tại');
 
-    if (!cart) {
-      throw new NotFoundException('Mục giỏ hàng không tồn tại');
-    }
-
-    if (cart.userId !== userId) {
-      throw new NotFoundException('Bạn không có quyền xóa mục này');
-    }
-
-    await this.cartItemRepository.delete(productId);
-
-    return this.getCart(userId);
+      await this.cartItemRepository.delete(cartItemId);
+      return this.getCart(userId);
   }
 
   async clearCart(userId: string) {
-    // Xóa tất cả CartItem có userId tương ứng
     const result = await this.cartRepository.delete({ userId: userId });
     
     return { 

@@ -25,4 +25,10 @@ export class AuthController {
     // 2. Tạo token
     return this.authService.login(user);
   }
+
+  @Post('refresh')
+  refresh(@Body() body: { refresh_token: string }) {
+
+    return this.authService.refreshTokens(body.refresh_token); 
+  }
 }

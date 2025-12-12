@@ -27,7 +27,7 @@ export class CartController {
   @Delete('remove')
   removeFromCart(@Request() req, @Body() dto: RemoveFromCartDto) {
     dto.userId = req.user.userId; 
-    return this.cartService.removeFromCart(dto.userId, dto.cartItemId);
+    return this.cartService.removeItem(dto.userId, dto.cartItemId);
   }
 
   @Delete('clear')

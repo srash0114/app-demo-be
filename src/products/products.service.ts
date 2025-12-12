@@ -5,12 +5,14 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { GetRandomProductDto } from './dto/get-random-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
+    private dataSource: DataSource,
   ) {}
 
   async findRandom(dto: GetRandomProductDto): Promise<Product[]> {
@@ -55,10 +57,11 @@ export class ProductsService {
     return await this.productsRepository.save(newProduct);
   }
 
-  async createBatch(createProductDtos: CreateProductDto[]): Promise<Product[]> {
+  async createBatch(userId: string,createProductDtos: CreateProductDto[]): Promise<Product[]> {
     const products = createProductDtos.map(dto => {
       return this.productsRepository.create({
         ...dto,
+        userId: userId,
         price: dto.price,
         rating: dto.rating || 0,
         reviewCount: dto.reviewCount || 0
@@ -68,4 +71,27 @@ export class ProductsService {
     // Lưu một lần cho hiệu quả
     return await this.productsRepository.save(products);
   }
+
+async deleteAll() {
+    // 1. Tắt khóa ngoại (SQLite)
+    await this.dataSource.query('PRAGMA foreign_keys = OFF;');
+    
+    try {
+      // --- SỬA Ở ĐÂY ---
+      // Thay vì dùng .delete({}), hãy dùng .clear()
+      // .clear() sẽ xóa toàn bộ dữ liệu trong bảng một cách hợp lệ
+      await this.productsRepository.clear();
+
+      // 2. Reset ID về 1
+      await this.dataSource.query("DELETE FROM sqlite_sequence WHERE name = 'product'"); 
+    } catch (error) {
+      throw error;
+    } finally {
+      // 3. Bật lại khóa ngoại (Luôn chạy dù lỗi hay không)
+      await this.dataSource.query('PRAGMA foreign_keys = ON;');
+    }
+
+    return { message: 'Đã xóa sạch sản phẩm và reset ID (SQLite)' };
+  }
+
 }
