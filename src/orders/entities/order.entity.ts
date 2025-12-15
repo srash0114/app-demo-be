@@ -16,6 +16,12 @@ export class Order {
   @Column({ default: 'PENDING' })
   status: string; // Trạng thái: PENDING, COMPLETED, CANCELLED
 
+  @Column()
+  shippingAddress: string;
+
+  @Column({ nullable: true })
+  notes: string;
+
   // Mối quan hệ: Nhiều đơn hàng thuộc về 1 User
   @ManyToOne(() => User, (user) => user.orders)
   user: User;

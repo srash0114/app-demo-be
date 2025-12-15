@@ -16,7 +16,8 @@ import { CartModule } from './cart/cart.module';
 import { Cart } from './cart/entities/cart.entity';
 import { CartItem } from './cart/entities/cart-item.entity';
 import { ConfigModule } from '@nestjs/config';
-
+import { OrderModule } from './orders/order.module';
+import { VnpayModule } from './payment/vnpay.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -30,6 +31,8 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     ProductsModule,
     CartModule,
+    OrderModule,
+    VnpayModule,
     ConfigModule.forRoot({
       isGlobal: true, // Quan trọng: Để dùng được ConfigService ở mọi nơi (Auth, User...) mà không cần import lại
     }),
