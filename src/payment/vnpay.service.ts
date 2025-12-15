@@ -36,12 +36,24 @@ export class VnpayService {
 
   createPaymentUrl(data: { amount: number; orderId: number; orderDescription: string; ipAddr: string }): string {
     const date = new Date();
-    const createDate = date.getFullYear() + ('0' + (date.getMonth() + 1)).slice(-2) + ('0' + date.getDate()).slice(-2) + 
-                       ('0' + date.getHours()).slice(-2) + ('0' + date.getMinutes()).slice(-2) + ('0' + date.getSeconds()).slice(-2);
-    
+
+    // Helper function để format date theo múi giờ Việt Nam (GMT+7)
+    const formatVnpayDate = (d: Date): string => {
+      const year = d.getFullYear();
+      const month = ('0' + (d.getMonth() + 1)).slice(-2);
+      const day = ('0' + d.getDate()).slice(-2);
+      const hours = ('0' + d.getHours()).slice(-2);
+      const minutes = ('0' + d.getMinutes()).slice(-2);
+      const seconds = ('0' + d.getSeconds()).slice(-2);
+      return `${year}${month}${day}${hours}${minutes}${seconds}`;
+    };
+
+    const createDate = formatVnpayDate(date);
+    const expireDate = formatVnpayDate(new Date(date.getTime() + 15 * 60000)); // +15 phút
+
     const orderId = data.orderId;
 
-    let vnp_Params = {};
+    let vnp_Params: Record<string, string | number> = {};
     vnp_Params['vnp_Version'] = '2.1.0';
     vnp_Params['vnp_Command'] = 'pay';
     vnp_Params['vnp_TmnCode'] = this.vnp_TmnCode;
@@ -54,18 +66,19 @@ export class VnpayService {
     vnp_Params['vnp_ReturnUrl'] = this.vnp_ReturnUrl;
     vnp_Params['vnp_IpAddr'] = data.ipAddr;
     vnp_Params['vnp_CreateDate'] = createDate;
-    vnp_Params['vnp_ExpireDate'] = (new Date(date.getTime() + 15*60000)).toISOString().replace(/[-:]/g, '').replace('T', '').split('.')[0];
-    
+    vnp_Params['vnp_ExpireDate'] = expireDate;
+
     vnp_Params = sortObject(vnp_Params);
-    
+
+    // Tạo signData KHÔNG encode để hash
     const signData = querystring.stringify(vnp_Params, { encode: false });
     const hmac = crypto.createHmac('sha512', this.vnp_HashSecret);
-    const vnp_SecureHash = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
-    
+    const vnp_SecureHash = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
+
     vnp_Params['vnp_SecureHash'] = vnp_SecureHash;
 
-    // Trả về URL thanh toán đầy đủ
-    return this.vnp_Url + '?' + querystring.stringify(vnp_Params, { encode: false });
+    // Trả về URL thanh toán - encode parameters cho URL
+    return this.vnp_Url + '?' + querystring.stringify(vnp_Params, { encode: true });
   }
 
   /**
@@ -73,54 +86,24 @@ export class VnpayService {
    * Dùng cho cả Return URL và IPN
    */
   verifyReturnUrl(vnp_Params: any): boolean {
-    let secureHash = vnp_Params['vnp_SecureHash'];
+    const secureHash = vnp_Params['vnp_SecureHash'];
 
     // 1. Xóa các tham số hash và hashType để chuẩn bị tính toán lại
     delete vnp_Params['vnp_SecureHash'];
     delete vnp_Params['vnp_SecureHashType'];
 
     // 2. Sắp xếp lại tham số theo alphabet (BẮT BUỘC theo chuẩn VNPay)
-    vnp_Params = this.sortObject(vnp_Params);
+    vnp_Params = sortObject(vnp_Params);
 
-    // 3. Tạo chuỗi dữ liệu cần hash
-    // Lưu ý: Dùng querystring.stringify hoặc custom logic như dưới đây
+    // 3. Tạo chuỗi dữ liệu cần hash (KHÔNG encode, giống lúc tạo URL)
     const signData = querystring.stringify(vnp_Params, { encode: false });
-    
-    // 4. Tính toán hash bằng thuật toán SHA512 (hoặc SHA256 tùy config VNPay của em)
-    // Đa số Sandbox VNPay hiện tại dùng SHA512
-    const hmac = crypto.createHmac("sha512", this.vnp_HashSecret);
-    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex"); 
+
+    // 4. Tính toán hash bằng thuật toán SHA512
+    const hmac = crypto.createHmac('sha512', this.vnp_HashSecret);
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     // 5. So sánh hash tính được với hash VNPay gửi về
     return secureHash === signed;
-  }
-
-  /**
-   * Hàm sắp xếp object theo key (A-Z) để phục vụ việc tạo chữ ký (Checksum)
-   */
-  private sortObject(obj: any): any {
-    const sorted = {};
-    const str: string[] = []; // KHẮC PHỤC LỖI: Khai báo rõ đây là mảng string
-    let key;
-    
-    for (key in obj) {
-      // Dùng Object.prototype.hasOwnProperty.call an toàn hơn obj.hasOwnProperty
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        str.push(encodeURIComponent(key));
-      }
-    }
-    
-    // Sắp xếp các key theo bảng chữ cái
-    str.sort();
-    
-    for (let i = 0; i < str.length; i++) {
-        // Lấy key đã sort
-        const currentKey = str[i];
-        // Gán vào object mới, đồng thời mã hóa value
-        sorted[currentKey] = encodeURIComponent(obj[currentKey]).replace(/%20/g, "+");
-    }
-    
-    return sorted;
   }
 
   getHashSecret(): string {

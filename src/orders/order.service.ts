@@ -41,8 +41,8 @@ export class OrderService {
     }
 
     // B. Lọc các sản phẩm user chọn mua (dựa trên dto.productIds)
-    const selectedItems = cart.items.filter(item => 
-        item.product && dto.productIds.includes(item.id)
+    const selectedItems = cart.items.filter(item =>
+        item.product && dto.productIds.includes(item.product.id)
     );
 
     if (selectedItems.length === 0) {
