@@ -61,6 +61,8 @@ export class OrderService {
         quantity: item.quantity,
         price: item.product.price,
         product: item.product,
+        size: item.size,     // Lưu size từ CartItem
+        color: item.color,   // Lưu color từ CartItem
       });
       orderItems.push(orderItem);
     }
@@ -86,9 +88,14 @@ export class OrderService {
       ipAddr: ipAddr,
     });
 
-    return { 
+    // F. Lưu paymentUrl và thời gian hết hạn (15 phút)
+    savedOrder.paymentUrl = paymentUrl;
+    savedOrder.paymentExpireAt = new Date(Date.now() + 15 * 60 * 1000);
+    await this.orderRepository.save(savedOrder);
+
+    return {
         orderId: savedOrder.id,
-        paymentUrl: paymentUrl 
+        paymentUrl: paymentUrl
     };
   }
 
@@ -287,6 +294,114 @@ export class OrderService {
     return {
       success: true,
       message: `Đơn hàng #${orderId} đã được hủy thành công.`
+    };
+  }
+
+  // --- 7. LẤY LẠI HOẶC TẠO MỚI LINK THANH TOÁN ---
+  async getPaymentUrl(
+    userId: number,
+    orderId: number,
+    ipAddr: string
+  ): Promise<{ orderId: number; paymentUrl: string; isNew: boolean }> {
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, user: { id: userId } },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Đơn hàng không tồn tại.');
+    }
+
+    if (order.status !== 'PENDING') {
+      throw new BadRequestException(
+        `Đơn hàng không thể thanh toán. Trạng thái hiện tại: ${order.status}`
+      );
+    }
+
+    // Kiểm tra link còn hạn không (còn ít nhất 1 phút)
+    const now = new Date();
+    const isExpired = !order.paymentExpireAt ||
+                      order.paymentExpireAt.getTime() < now.getTime() + 60 * 1000;
+
+    if (!isExpired && order.paymentUrl) {
+      // Link còn hạn, trả về link cũ
+      return {
+        orderId: order.id,
+        paymentUrl: order.paymentUrl,
+        isNew: false
+      };
+    }
+
+    // Link hết hạn hoặc chưa có, tạo link mới
+    const totalPrice = parseInt(order.totalPrice);
+    const paymentUrl = this.vnpayService.createPaymentUrl({
+      amount: totalPrice,
+      orderId: order.id,
+      orderDescription: `Thanh toan don hang #${order.id}`,
+      ipAddr: ipAddr,
+    });
+
+    // Cập nhật link mới và thời gian hết hạn
+    order.paymentUrl = paymentUrl;
+    order.paymentExpireAt = new Date(Date.now() + 15 * 60 * 1000);
+    await this.orderRepository.save(order);
+
+    return {
+      orderId: order.id,
+      paymentUrl: paymentUrl,
+      isNew: true
+    };
+  }
+
+  // --- 8. THỐNG KÊ ĐƠN HÀNG ---
+  async getOrderStatistics(): Promise<{
+    totalOrders: number;
+    totalCustomers: number;
+    totalRevenue: number;
+    ordersByStatus: { status: string; count: number }[];
+    recentOrders: Order[];
+  }> {
+    // Tổng số đơn hàng
+    const totalOrders = await this.orderRepository.count();
+
+    // Số khách hàng đã đặt hàng (unique users)
+    const customersResult = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('COUNT(DISTINCT order.userId)', 'count')
+      .getRawOne();
+    const totalCustomers = parseInt(customersResult?.count || '0');
+
+    // Tổng doanh thu (chỉ tính đơn COMPLETED)
+    const revenueResult = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('SUM(CAST(order.totalPrice AS INTEGER))', 'total')
+      .where('order.status = :status', { status: 'COMPLETED' })
+      .getRawOne();
+    const totalRevenue = parseInt(revenueResult?.total || '0');
+
+    // Số đơn hàng theo trạng thái
+    const ordersByStatus = await this.orderRepository
+      .createQueryBuilder('order')
+      .select('order.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('order.status')
+      .getRawMany();
+
+    // 10 đơn hàng gần nhất
+    const recentOrders = await this.orderRepository.find({
+      relations: ['user', 'items', 'items.product'],
+      order: { createdAt: 'DESC' },
+      take: 10,
+    });
+
+    return {
+      totalOrders,
+      totalCustomers,
+      totalRevenue,
+      ordersByStatus: ordersByStatus.map(item => ({
+        status: item.status,
+        count: parseInt(item.count),
+      })),
+      recentOrders,
     };
   }
 }

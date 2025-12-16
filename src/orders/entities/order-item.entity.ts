@@ -13,6 +13,12 @@ export class OrderItem {
   @Column()
   price: string;
 
+  @Column({ nullable: true })
+  size: string; // Size sản phẩm đã chọn
+
+  @Column({ nullable: true })
+  color: string; // Màu sắc sản phẩm đã chọn
+
   @ManyToOne(() => Order, (order) => order.items, { onDelete: 'CASCADE' })
   order: Order;
 

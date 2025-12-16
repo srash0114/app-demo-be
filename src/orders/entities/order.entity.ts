@@ -22,6 +22,12 @@ export class Order {
   @Column({ nullable: true })
   notes: string;
 
+  @Column({ nullable: true })
+  paymentUrl: string; // Lưu link thanh toán VNPay
+
+  @Column({ nullable: true })
+  paymentExpireAt: Date; // Thời gian hết hạn link thanh toán
+
   // Mối quan hệ: Nhiều đơn hàng thuộc về 1 User
   @ManyToOne(() => User, (user) => user.orders)
   user: User;

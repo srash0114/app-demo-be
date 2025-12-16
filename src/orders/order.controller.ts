@@ -17,7 +17,13 @@ export class OrderController {
     return this.orderService.createOrderAndGetPaymentUrl(userId, ipAddr, dto);
   }
 
-  // API 2: VNPay IPN (Instant Payment Notification)
+  // API 2: Thống kê đơn hàng (public hoặc có thể thêm guard admin)
+  @Get('statistics')
+  async getStatistics() {
+    return this.orderService.getOrderStatistics();
+  }
+
+  // API 3: VNPay IPN (Instant Payment Notification)
   // Đây là API VNPay sẽ gọi ngầm (Server-to-Server) để báo kết quả
   @Get('vnpay_ipn')
   async vnpayIpn(@Query() query) {
@@ -167,5 +173,14 @@ export class OrderController {
   async cancelOrder(@Req() req, @Param('id', ParseIntPipe) orderId: number) {
     const userId = req.user.userId;
     return this.orderService.cancelOrder(userId, orderId);
+  }
+
+  // API 7: Lấy lại link thanh toán (nếu còn hạn) hoặc tạo mới
+  @Post(':id/payment')
+  @UseGuards(AuthGuard('jwt'))
+  async getPaymentUrl(@Req() req, @Param('id', ParseIntPipe) orderId: number) {
+    const userId = req.user.userId;
+    const ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    return this.orderService.getPaymentUrl(userId, orderId, ipAddr);
   }
 }
