@@ -4,15 +4,28 @@ import * as querystring from 'qs';
 import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
 
-// Giả định hàm sortObject() sắp xếp các key theo Alphabet
-const sortObject = (obj) => {
-  const sorted = {};
-  const keys = Object.keys(obj).sort();
-  keys.forEach((key) => {
-    sorted[key] = obj[key];
-  });
+// Hàm sortObject theo chuẩn VNPay - encode cả key và value
+function sortObject(obj: Record<string, any>): Record<string, string> {
+  const sorted: Record<string, string> = {};
+  const str: string[] = [];
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      str.push(encodeURIComponent(key));
+    }
+  }
+
+  str.sort();
+
+  for (let i = 0; i < str.length; i++) {
+    const key = str[i];
+    // Decode key để lấy giá trị gốc từ obj, sau đó encode value
+    const originalKey = decodeURIComponent(key);
+    sorted[key] = encodeURIComponent(String(obj[originalKey])).replace(/%20/g, '+');
+  }
+
   return sorted;
-};
+}
 
 @Injectable()
 export class VnpayService {
@@ -77,8 +90,8 @@ export class VnpayService {
 
     vnp_Params['vnp_SecureHash'] = vnp_SecureHash;
 
-    // Trả về URL thanh toán - encode parameters cho URL
-    return this.vnp_Url + '?' + querystring.stringify(vnp_Params, { encode: true });
+    // Trả về URL thanh toán - KHÔNG encode vì đã encode trong sortObject
+    return this.vnp_Url + '?' + querystring.stringify(vnp_Params, { encode: false });
   }
 
   /**

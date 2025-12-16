@@ -42,7 +42,7 @@ export class OrderService {
 
     // B. Lọc các sản phẩm user chọn mua (dựa trên dto.productIds)
     const selectedItems = cart.items.filter(item =>
-        item.product && dto.productIds.includes(item.product.id)
+        item.product && dto.productIds.includes(item.id)
     );
 
     if (selectedItems.length === 0) {
@@ -156,5 +156,137 @@ export class OrderService {
         await this.orderRepository.save(order);
         return { RspCode: '00', Message: 'Success' }; // Vẫn trả về 00 để VNPay biết mình đã nhận tin
     }
+  }
+
+  // --- 3. LẤY DANH SÁCH ĐƠN HÀNG CỦA USER ---
+  async getOrdersByUser(userId: number): Promise<Order[]> {
+    return this.orderRepository.find({
+      where: { user: { id: userId } },
+      relations: ['items', 'items.product'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  // --- 4. LẤY CHI TIẾT 1 ĐƠN HÀNG ---
+  async getOrderById(userId: number, orderId: number): Promise<Order> {
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, user: { id: userId } },
+      relations: ['items', 'items.product'],
+    });
+
+    if (!order) {
+      throw new NotFoundException('Đơn hàng không tồn tại.');
+    }
+
+    return order;
+  }
+
+  // --- 5. XỬ LÝ KHI USER REDIRECT VỀ TỪ VNPAY ---
+  async handleVnpayReturn(vnpayParams: any): Promise<{
+    success: boolean;
+    orderId: string;
+    amount: number;
+    message: string;
+    transactionNo?: string;
+  }> {
+    const orderId = vnpayParams['vnp_TxnRef'];
+    const rspCode = vnpayParams['vnp_ResponseCode'];
+    const amount = parseInt(vnpayParams['vnp_Amount']) / 100;
+    const transactionNo = vnpayParams['vnp_TransactionNo'];
+
+    // Tìm đơn hàng
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['user', 'items', 'items.product']
+    });
+
+    if (!order) {
+      return {
+        success: false,
+        orderId,
+        amount,
+        message: 'Đơn hàng không tồn tại'
+      };
+    }
+
+    // Nếu đơn hàng chưa được xử lý và thanh toán thành công
+    if (order.status === 'PENDING' && rspCode === '00') {
+      order.status = 'COMPLETED';
+      await this.orderRepository.save(order);
+
+      // Xóa sản phẩm khỏi giỏ hàng
+      const cart = await this.cartRepository.findOne({
+        where: { userId: order.user.id.toString() },
+        relations: ['items', 'items.product']
+      });
+
+      if (cart && cart.items.length > 0) {
+        const purchasedProductIds = order.items.map(oi => oi.product.id);
+        const cartItemsToDelete = cart.items
+          .filter(ci => purchasedProductIds.includes(ci.product.id))
+          .map(ci => ci.id);
+
+        if (cartItemsToDelete.length > 0) {
+          await this.cartItemRepository.delete({ id: In(cartItemsToDelete) });
+        }
+      }
+
+      return {
+        success: true,
+        orderId,
+        amount,
+        transactionNo,
+        message: 'Thanh toán thành công'
+      };
+    }
+
+    // Đơn hàng đã xử lý trước đó
+    if (order.status === 'COMPLETED') {
+      return {
+        success: true,
+        orderId,
+        amount,
+        transactionNo,
+        message: 'Đơn hàng đã được thanh toán'
+      };
+    }
+
+    // Thanh toán thất bại
+    if (rspCode !== '00') {
+      order.status = 'CANCELLED';
+      await this.orderRepository.save(order);
+    }
+
+    return {
+      success: false,
+      orderId,
+      amount,
+      message: 'Thanh toán thất bại'
+    };
+  }
+
+  // --- 6. HỦY ĐƠN HÀNG KHI ĐANG PENDING ---
+  async cancelOrder(userId: number, orderId: number): Promise<{ success: boolean; message: string }> {
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, user: { id: userId } },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Đơn hàng không tồn tại.');
+    }
+
+    if (order.status !== 'PENDING') {
+      throw new BadRequestException(
+        `Không thể hủy đơn hàng. Trạng thái hiện tại: ${order.status}`
+      );
+    }
+
+    order.status = 'CANCELLED';
+    await this.orderRepository.save(order);
+
+    return {
+      success: true,
+      message: `Đơn hàng #${orderId} đã được hủy thành công.`
+    };
   }
 }
