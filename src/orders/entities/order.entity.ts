@@ -20,6 +20,15 @@ export class Order {
   shippingAddress: string;
 
   @Column({ nullable: true })
+  shippingRecipientName?: string;
+
+  @Column({ nullable: true })
+  shippingPhone?: string;
+
+  @Column({ type: 'int', nullable: true })
+  shippingAddressId?: number;
+
+  @Column({ nullable: true })
   notes: string;
 
   @Column({ nullable: true })

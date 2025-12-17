@@ -8,6 +8,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { ProductsService } from 'src/products/products.service';
 import { VnpayService } from 'src/payment/vnpay.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { ShippingAddress } from '../user/entities/shipping-address.entity.js';
 
 @Injectable()
 export class OrderService {
@@ -20,6 +21,8 @@ export class OrderService {
     private cartRepository: Repository<Cart>,
     @InjectRepository(CartItem) // Inject Repository này để xóa item
     private cartItemRepository: Repository<CartItem>,
+    @InjectRepository(ShippingAddress)
+    private readonly shippingAddressRepo: Repository<ShippingAddress>,
     private readonly vnpayService: VnpayService,
   ) {}
 
@@ -74,6 +77,9 @@ export class OrderService {
       user: { id: userId } as any,
       items: orderItems, // TypeORM cascade sẽ lưu luôn OrderItem
       shippingAddress: dto.shippingAddress,
+      shippingRecipientName: dto.recipientName,
+      shippingPhone: dto.phone,
+      shippingAddressId: dto.shippingAddressId,
       notes: dto.notes,
     });
 
@@ -353,51 +359,64 @@ export class OrderService {
   }
 
   // --- 8. THỐNG KÊ ĐƠN HÀNG ---
-  async getOrderStatistics(): Promise<{
+  async getOrderStatistics(userId: number): Promise<{
     totalOrders: number;
-    totalCustomers: number;
     totalRevenue: number;
     ordersByStatus: { status: string; count: number }[];
     recentOrders: Order[];
   }> {
-    // Tổng số đơn hàng
-    const totalOrders = await this.orderRepository.count();
+    const sellerId = String(userId);
 
-    // Số khách hàng đã đặt hàng (unique users)
-    const customersResult = await this.orderRepository
+    const totalOrdersResult = await this.orderRepository
       .createQueryBuilder('order')
-      .select('COUNT(DISTINCT order.userId)', 'count')
+      .innerJoin('order.items', 'item')
+      .innerJoin('item.product', 'product')
+      .where('product.userId = :sellerId', { sellerId })
+      .select('COUNT(DISTINCT order.id)', 'count')
       .getRawOne();
-    const totalCustomers = parseInt(customersResult?.count || '0');
+    const totalOrders = parseInt(totalOrdersResult?.count || '0');
 
-    // Tổng doanh thu (chỉ tính đơn COMPLETED)
     const revenueResult = await this.orderRepository
       .createQueryBuilder('order')
-      .select('SUM(CAST(order.totalPrice AS INTEGER))', 'total')
+      .innerJoin('order.items', 'revenueItem')
+      .innerJoin('revenueItem.product', 'revenueProduct')
+      .select('SUM(CAST(revenueItem.price AS REAL) * revenueItem.quantity)', 'total')
       .where('order.status = :status', { status: 'COMPLETED' })
+      .andWhere('revenueProduct.userId = :sellerId', { sellerId })
       .getRawOne();
-    const totalRevenue = parseInt(revenueResult?.total || '0');
+    const totalRevenue = parseFloat(revenueResult?.total || '0');
 
-    // Số đơn hàng theo trạng thái
-    const ordersByStatus = await this.orderRepository
+    const ordersByStatusRaw = await this.orderRepository
       .createQueryBuilder('order')
+      .innerJoin('order.items', 'statusItem')
+      .innerJoin('statusItem.product', 'statusProduct')
       .select('order.status', 'status')
-      .addSelect('COUNT(*)', 'count')
+      .addSelect('COUNT(DISTINCT order.id)', 'count')
+      .where('statusProduct.userId = :sellerId', { sellerId })
       .groupBy('order.status')
       .getRawMany();
 
-    // 10 đơn hàng gần nhất
-    const recentOrders = await this.orderRepository.find({
-      relations: ['user', 'items', 'items.product'],
-      order: { createdAt: 'DESC' },
-      take: 10,
+    const recentOrdersRaw = await this.orderRepository
+      .createQueryBuilder('order')
+      .innerJoin('order.items', 'recentItem')
+      .innerJoin('recentItem.product', 'recentProduct')
+      .leftJoinAndSelect('order.user', 'user')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('items.product', 'itemProduct')
+      .where('recentProduct.userId = :sellerId', { sellerId })
+      .orderBy('order.createdAt', 'DESC')
+      .take(10)
+      .getMany();
+
+    const recentOrders = recentOrdersRaw.map(order => {
+      order.items = order.items.filter(item => item.product?.userId === sellerId);
+      return order;
     });
 
     return {
       totalOrders,
-      totalCustomers,
       totalRevenue,
-      ordersByStatus: ordersByStatus.map(item => ({
+      ordersByStatus: ordersByStatusRaw.map(item => ({
         status: item.status,
         count: parseInt(item.count),
       })),

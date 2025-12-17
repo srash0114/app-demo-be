@@ -10,9 +10,10 @@ import { OrderController } from './order.controller';
 import { CartModule } from 'src/cart/cart.module'; 
 import { VnpayModule } from 'src/payment/vnpay.module';
 import { ProductsModule } from 'src/products/products.module'; // Cần Product để kiểm tra giá
+import { ShippingAddress } from '../user/entities/shipping-address.entity.js';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, OrderItem]),
+    TypeOrmModule.forFeature([Order, OrderItem, ShippingAddress]),
     
     CartModule,
     VnpayModule,
@@ -20,6 +21,6 @@ import { ProductsModule } from 'src/products/products.module'; // Cần Product 
   ],
   controllers: [OrderController],
   providers: [OrderService],
-  exports: [OrderService, TypeOrmModule.forFeature([Order, OrderItem])],
+  exports: [OrderService, TypeOrmModule.forFeature([Order, OrderItem, ShippingAddress])],
 })
 export class OrderModule {}

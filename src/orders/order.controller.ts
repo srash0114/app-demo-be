@@ -18,9 +18,11 @@ export class OrderController {
   }
 
   // API 2: Thống kê đơn hàng (public hoặc có thể thêm guard admin)
+  @UseGuards(AuthGuard('jwt'))
   @Get('statistics')
-  async getStatistics() {
-    return this.orderService.getOrderStatistics();
+  async getStatistics(@Req() req) {
+    const userId = req.user.userId;
+    return this.orderService.getOrderStatistics(userId);
   }
 
   // API 3: VNPay IPN (Instant Payment Notification)
@@ -142,7 +144,6 @@ export class OrderController {
             ` : ''}
         </div>
 
-        // <a href="/" class="btn">Về trang chủ</a>
     </div>
 </body>
 </html>

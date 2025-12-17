@@ -1,7 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Todo } from 'src/todo/entities/todo.entity';
-import  { Order } from '../../orders/entities/order.entity';
+import { Order } from '../../orders/entities/order.entity';
+import { ShippingAddress } from './shipping-address.entity.js';
 
 @Entity()
 export class User {
@@ -13,6 +14,9 @@ export class User {
 
     @Column()
     password: string;
+
+    @Column({ nullable: true })
+    fullName?: string;
 
     @BeforeInsert()
     async hashPassword() {
@@ -28,4 +32,7 @@ export class User {
 
     @OneToMany(() => Order, (order) => order.user)
     orders: Order[];
+
+    @OneToMany(() => ShippingAddress, (address: ShippingAddress) => address.user, { cascade: true })
+    shippingAddresses: ShippingAddress[];
 }

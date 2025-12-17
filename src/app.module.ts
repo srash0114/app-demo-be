@@ -18,12 +18,13 @@ import { CartItem } from './cart/entities/cart-item.entity';
 import { ConfigModule } from '@nestjs/config';
 import { OrderModule } from './orders/order.module';
 import { VnpayModule } from './payment/vnpay.module';
+import { ShippingAddress } from './user/entities/shipping-address.entity.js';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite',
-      entities: [Todo, Order, User, Product, OrderItem, Category, Cart, CartItem],
+      entities: [Todo, Order, User, Product, OrderItem, Category, Cart, CartItem, ShippingAddress],
       synchronize: true,
     }),
     TodoModule,
