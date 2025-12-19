@@ -19,12 +19,16 @@ import { ConfigModule } from '@nestjs/config';
 import { OrderModule } from './orders/order.module';
 import { VnpayModule } from './payment/vnpay.module';
 import { ShippingAddress } from './user/entities/shipping-address.entity.js';
+import { ProvincesModule } from './provinces/provinces.module';
+import { Province } from './provinces/entities/province.entity';
+import { District } from './provinces/entities/district.entity';
+import { Ward } from './provinces/entities/ward.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite',
-      entities: [Todo, Order, User, Product, OrderItem, Category, Cart, CartItem, ShippingAddress],
+      entities: [Todo, Order, User, Product, OrderItem, Category, Cart, CartItem, ShippingAddress, Province, District, Ward],
       synchronize: true,
     }),
     TodoModule,
@@ -34,6 +38,7 @@ import { ShippingAddress } from './user/entities/shipping-address.entity.js';
     CartModule,
     OrderModule,
     VnpayModule,
+    ProvincesModule,
     ConfigModule.forRoot({
       isGlobal: true, // Quan trọng: Để dùng được ConfigService ở mọi nơi (Auth, User...) mà không cần import lại
     }),

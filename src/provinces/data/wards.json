@@ -1,0 +1,260 @@
+[
+  {
+    "id": "00001",
+    "name": "Phường Phúc Xá",
+    "code": "00001",
+    "district_id": "001"
+  },
+  {
+    "id": "00004",
+    "name": "Phường Trúc Bạch",
+    "code": "00004",
+    "district_id": "001"
+  },
+  {
+    "id": "00006",
+    "name": "Phường Vĩnh Phúc",
+    "code": "00006",
+    "district_id": "001"
+  },
+  {
+    "id": "00007",
+    "name": "Phường Cống Vị",
+    "code": "00007",
+    "district_id": "001"
+  },
+  {
+    "id": "00008",
+    "name": "Phường Liễu Giai",
+    "code": "00008",
+    "district_id": "001"
+  },
+  {
+    "id": "00010",
+    "name": "Phường Nguyễn Trung Trực",
+    "code": "00010",
+    "district_id": "001"
+  },
+  {
+    "id": "00013",
+    "name": "Phường Quán Thánh",
+    "code": "00013",
+    "district_id": "001"
+  },
+  {
+    "id": "00016",
+    "name": "Phường Ngọc Hà",
+    "code": "00016",
+    "district_id": "001"
+  },
+  {
+    "id": "00019",
+    "name": "Phường Điện Biên",
+    "code": "00019",
+    "district_id": "001"
+  },
+  {
+    "id": "00022",
+    "name": "Phường Đội Cấn",
+    "code": "00022",
+    "district_id": "001"
+  },
+  {
+    "id": "00025",
+    "name": "Phường Ngọc Khánh",
+    "code": "00025",
+    "district_id": "001"
+  },
+  {
+    "id": "00028",
+    "name": "Phường Kim Mã",
+    "code": "00028",
+    "district_id": "001"
+  },
+  {
+    "id": "00031",
+    "name": "Phường Giảng Võ",
+    "code": "00031",
+    "district_id": "001"
+  },
+  {
+    "id": "00034",
+    "name": "Phường Thành Công",
+    "code": "00034",
+    "district_id": "001"
+  },
+  {
+    "id": "00037",
+    "name": "Phường Phúc Tân",
+    "code": "00037",
+    "district_id": "002"
+  },
+  {
+    "id": "00040",
+    "name": "Phường Đồng Xuân",
+    "code": "00040",
+    "district_id": "002"
+  },
+  {
+    "id": "00043",
+    "name": "Phường Hàng Mã",
+    "code": "00043",
+    "district_id": "002"
+  },
+  {
+    "id": "00046",
+    "name": "Phường Hàng Buồm",
+    "code": "00046",
+    "district_id": "002"
+  },
+  {
+    "id": "00049",
+    "name": "Phường Hàng Đào",
+    "code": "00049",
+    "district_id": "002"
+  },
+  {
+    "id": "00052",
+    "name": "Phường Hàng Bồ",
+    "code": "00052",
+    "district_id": "002"
+  },
+  {
+    "id": "00055",
+    "name": "Phường Cửa Đông",
+    "code": "00055",
+    "district_id": "002"
+  },
+  {
+    "id": "00058",
+    "name": "Phường Lý Thái Tổ",
+    "code": "00058",
+    "district_id": "002"
+  },
+  {
+    "id": "00061",
+    "name": "Phường Hàng Bạc",
+    "code": "00061",
+    "district_id": "002"
+  },
+  {
+    "id": "00064",
+    "name": "Phường Hàng Gai",
+    "code": "00064",
+    "district_id": "002"
+  },
+  {
+    "id": "00067",
+    "name": "Phường Chương Dương",
+    "code": "00067",
+    "district_id": "002"
+  },
+  {
+    "id": "00070",
+    "name": "Phường Hàng Trống",
+    "code": "00070",
+    "district_id": "002"
+  },
+  {
+    "id": "00073",
+    "name": "Phường Cửa Nam",
+    "code": "00073",
+    "district_id": "002"
+  },
+  {
+    "id": "00076",
+    "name": "Phường Hàng Bông",
+    "code": "00076",
+    "district_id": "002"
+  },
+  {
+    "id": "00079",
+    "name": "Phường Tràng Tiền",
+    "code": "00079",
+    "district_id": "002"
+  },
+  {
+    "id": "00082",
+    "name": "Phường Trần Hưng Đạo",
+    "code": "00082",
+    "district_id": "002"
+  },
+  {
+    "id": "00085",
+    "name": "Phường Phan Chu Trinh",
+    "code": "00085",
+    "district_id": "002"
+  },
+  {
+    "id": "00088",
+    "name": "Phường Hàng Bài",
+    "code": "00088",
+    "district_id": "002"
+  },
+  {
+    "id": "26734",
+    "name": "Phường Tân Định",
+    "code": "26734",
+    "district_id": "726"
+  },
+  {
+    "id": "26737",
+    "name": "Phường Đa Kao",
+    "code": "26737",
+    "district_id": "726"
+  },
+  {
+    "id": "26740",
+    "name": "Phường Bến Nghé",
+    "code": "26740",
+    "district_id": "726"
+  },
+  {
+    "id": "26743",
+    "name": "Phường Bến Thành",
+    "code": "26743",
+    "district_id": "726"
+  },
+  {
+    "id": "26746",
+    "name": "Phường Nguyễn Thái Bình",
+    "code": "26746",
+    "district_id": "726"
+  },
+  {
+    "id": "26749",
+    "name": "Phường Cô Giang",
+    "code": "26749",
+    "district_id": "726"
+  },
+  {
+    "id": "26752",
+    "name": "Phường Cầu Kho",
+    "code": "26752",
+    "district_id": "726"
+  },
+  {
+    "id": "26755",
+    "name": "Phường Cầu Ông Lãnh",
+    "code": "26755",
+    "district_id": "726"
+  },
+  {
+    "id": "26758",
+    "name": "Phường Đakao",
+    "code": "26758",
+    "district_id": "726"
+  },
+  {
+    "id": "26761",
+    "name": "Phường Nguyễn Cư Trinh",
+    "code": "26761",
+    "district_id": "726"
+  },
+  {
+    "id": "26764",
+    "name": "Phường Cô Giang",
+    "code": "26764",
+    "district_id": "726"
+  }
+]

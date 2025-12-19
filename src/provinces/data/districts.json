@@ -1,0 +1,296 @@
+[
+  {
+    "id": "001",
+    "name": "Quận Ba Đình",
+    "code": "001",
+    "province_id": "01"
+  },
+  {
+    "id": "002",
+    "name": "Quận Hoàn Kiếm",
+    "code": "002",
+    "province_id": "01"
+  },
+  {
+    "id": "003",
+    "name": "Quận Tây Hồ",
+    "code": "003",
+    "province_id": "01"
+  },
+  {
+    "id": "004",
+    "name": "Quận Long Biên",
+    "code": "004",
+    "province_id": "01"
+  },
+  {
+    "id": "005",
+    "name": "Quận Cầu Giấy",
+    "code": "005",
+    "province_id": "01"
+  },
+  {
+    "id": "006",
+    "name": "Quận Đống Đa",
+    "code": "006",
+    "province_id": "01"
+  },
+  {
+    "id": "007",
+    "name": "Quận Hai Bà Trưng",
+    "code": "007",
+    "province_id": "01"
+  },
+  {
+    "id": "008",
+    "name": "Quận Hoàng Mai",
+    "code": "008",
+    "province_id": "01"
+  },
+  {
+    "id": "009",
+    "name": "Quận Thanh Xuân",
+    "code": "009",
+    "province_id": "01"
+  },
+  {
+    "id": "016",
+    "name": "Huyện Sóc Sơn",
+    "code": "016",
+    "province_id": "01"
+  },
+  {
+    "id": "017",
+    "name": "Huyện Đông Anh",
+    "code": "017",
+    "province_id": "01"
+  },
+  {
+    "id": "018",
+    "name": "Huyện Gia Lâm",
+    "code": "018",
+    "province_id": "01"
+  },
+  {
+    "id": "019",
+    "name": "Quận Nam Từ Liêm",
+    "code": "019",
+    "province_id": "01"
+  },
+  {
+    "id": "020",
+    "name": "Huyện Thanh Trì",
+    "code": "020",
+    "province_id": "01"
+  },
+  {
+    "id": "021",
+    "name": "Quận Bắc Từ Liêm",
+    "code": "021",
+    "province_id": "01"
+  },
+  {
+    "id": "250",
+    "name": "Huyện Mèo Vạc",
+    "code": "250",
+    "province_id": "02"
+  },
+  {
+    "id": "251",
+    "name": "Huyện Đồng Văn",
+    "code": "251",
+    "province_id": "02"
+  },
+  {
+    "id": "252",
+    "name": "Huyện Mèo Vạc",
+    "code": "252",
+    "province_id": "02"
+  },
+  {
+    "id": "253",
+    "name": "Huyện Yên Minh",
+    "code": "253",
+    "province_id": "02"
+  },
+  {
+    "id": "254",
+    "name": "Huyện Quản Bạ",
+    "code": "254",
+    "province_id": "02"
+  },
+  {
+    "id": "255",
+    "name": "Huyện Vị Xuyên",
+    "code": "255",
+    "province_id": "02"
+  },
+  {
+    "id": "256",
+    "name": "Huyện Bắc Mê",
+    "code": "256",
+    "province_id": "02"
+  },
+  {
+    "id": "257",
+    "name": "Huyện Hoàng Su Phì",
+    "code": "257",
+    "province_id": "02"
+  },
+  {
+    "id": "258",
+    "name": "Huyện Xín Mần",
+    "code": "258",
+    "province_id": "02"
+  },
+  {
+    "id": "259",
+    "name": "Huyện Bắc Quang",
+    "code": "259",
+    "province_id": "02"
+  },
+  {
+    "id": "260",
+    "name": "Huyện Quang Bình",
+    "code": "260",
+    "province_id": "02"
+  },
+  {
+    "id": "726",
+    "name": "Quận 1",
+    "code": "726",
+    "province_id": "79"
+  },
+  {
+    "id": "727",
+    "name": "Quận 12",
+    "code": "727",
+    "province_id": "79"
+  },
+  {
+    "id": "728",
+    "name": "Quận Thủ Đức",
+    "code": "728",
+    "province_id": "79"
+  },
+  {
+    "id": "729",
+    "name": "Quận 9",
+    "code": "729",
+    "province_id": "79"
+  },
+  {
+    "id": "730",
+    "name": "Quận Gò Vấp",
+    "code": "730",
+    "province_id": "79"
+  },
+  {
+    "id": "731",
+    "name": "Quận Bình Thạnh",
+    "code": "731",
+    "province_id": "79"
+  },
+  {
+    "id": "732",
+    "name": "Quận Tân Bình",
+    "code": "732",
+    "province_id": "79"
+  },
+  {
+    "id": "733",
+    "name": "Quận Tân Phú",
+    "code": "733",
+    "province_id": "79"
+  },
+  {
+    "id": "734",
+    "name": "Quận Phú Nhuận",
+    "code": "734",
+    "province_id": "79"
+  },
+  {
+    "id": "735",
+    "name": "Quận 2",
+    "code": "735",
+    "province_id": "79"
+  },
+  {
+    "id": "736",
+    "name": "Quận 3",
+    "code": "736",
+    "province_id": "79"
+  },
+  {
+    "id": "737",
+    "name": "Quận 10",
+    "code": "737",
+    "province_id": "79"
+  },
+  {
+    "id": "738",
+    "name": "Quận 11",
+    "code": "738",
+    "province_id": "79"
+  },
+  {
+    "id": "739",
+    "name": "Quận 4",
+    "code": "739",
+    "province_id": "79"
+  },
+  {
+    "id": "740",
+    "name": "Quận 5",
+    "code": "740",
+    "province_id": "79"
+  },
+  {
+    "id": "741",
+    "name": "Quận 6",
+    "code": "741",
+    "province_id": "79"
+  },
+  {
+    "id": "742",
+    "name": "Quận 8",
+    "code": "742",
+    "province_id": "79"
+  },
+  {
+    "id": "743",
+    "name": "Quận Bình Tân",
+    "code": "743",
+    "province_id": "79"
+  },
+  {
+    "id": "744",
+    "name": "Quận 7",
+    "code": "744",
+    "province_id": "79"
+  },
+  {
+    "id": "747",
+    "name": "Huyện Củ Chi",
+    "code": "747",
+    "province_id": "79"
+  },
+  {
+    "id": "748",
+    "name": "Huyện Hóc Môn",
+    "code": "748",
+    "province_id": "79"
+  },
+  {
+    "id": "749",
+    "name": "Huyện Nhà Bè",
+    "code": "749",
+    "province_id": "79"
+  },
+  {
+    "id": "750",
+    "name": "Huyện Cần Giờ",
+    "code": "750",
+    "province_id": "79"
+  }
+]
