@@ -1,6 +1,7 @@
-import { Controller, Post, Get, Delete, Body, Req, Query, Res, UseGuards, Param, ParseIntPipe, Header } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Req, Query, Res, UseGuards, Param, ParseIntPipe, Header, Patch } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { AuthGuard } from '@nestjs/passport';
 @Controller('orders')
 export class OrderController {
@@ -184,4 +185,17 @@ export class OrderController {
     const ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     return this.orderService.getPaymentUrl(userId, orderId, ipAddr);
   }
+
+  // API 8: Cập nhật trạng thái đơn hàng (cho người bán)
+  @Patch(':id/status')
+  @UseGuards(AuthGuard('jwt'))
+  async updateOrderStatus(
+    @Req() req,
+    @Param('id', ParseIntPipe) orderId: number,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto
+  ) {
+    const userId = req.user.userId;
+    return this.orderService.updateOrderStatus(userId, orderId, updateOrderStatusDto);
+  }
 }
+

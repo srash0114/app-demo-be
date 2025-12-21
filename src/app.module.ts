@@ -12,6 +12,7 @@ import { Product } from './products/entities/product.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { ProductsModule } from './products/products.module';
 import { Category } from './categories/entities/category.entity';
+import { CategoriesModule } from './categories/categories.module';
 import { CartModule } from './cart/cart.module';
 import { Cart } from './cart/entities/cart.entity';
 import { CartItem } from './cart/entities/cart-item.entity';
@@ -23,22 +24,26 @@ import { ProvincesModule } from './provinces/provinces.module';
 import { Province } from './provinces/entities/province.entity';
 import { District } from './provinces/entities/district.entity';
 import { Ward } from './provinces/entities/ward.entity';
+import { FavoritesModule } from './favorites/favorites.module';
+import { Favorite } from './favorites/entities/favorite.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite',
-      entities: [Todo, Order, User, Product, OrderItem, Category, Cart, CartItem, ShippingAddress, Province, District, Ward],
+      entities: [Todo, Order, User, Product, OrderItem, Category, Cart, CartItem, ShippingAddress, Province, District, Ward, Favorite],
       synchronize: true,
     }),
     TodoModule,
     UserModule,
     AuthModule,
     ProductsModule,
+    CategoriesModule,
     CartModule,
     OrderModule,
     VnpayModule,
     ProvincesModule,
+    FavoritesModule,
     ConfigModule.forRoot({
       isGlobal: true, // Quan trọng: Để dùng được ConfigService ở mọi nơi (Auth, User...) mà không cần import lại
     }),

@@ -19,7 +19,7 @@ export class Product {
   price: string;
 
   @Column({ type: 'text' })
-  imageBase64: string;
+  imageUrl: string;
 
   @Column({ type: 'text', nullable: true })
   description: string;
@@ -36,8 +36,14 @@ export class Product {
   @Column('simple-array', { nullable: true })
   colors: string[];
 
-  @ManyToOne(() => Category, (category) => category.products)
-  category: Category;
+  @Column({ type: 'int', default: 0 })
+  quantity: number; // Số lượng sản phẩm còn trong kho
+
+  @Column({ type: 'boolean', default: false })
+  isSoldOut: boolean; // Trạng thái bán hết
+
+  @ManyToOne(() => Category, (category) => category.products, { nullable: true })
+  category: Category | null;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
   orderItems: OrderItem[];

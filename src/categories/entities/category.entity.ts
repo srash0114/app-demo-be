@@ -7,9 +7,8 @@ export class Category {
   id: number;
 
   @Column()
-  name: string; // Tên danh mục (Ví dụ: Áo, Quần...)
+  name: string;
 
-  // Một danh mục có nhiều sản phẩm
   @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 }

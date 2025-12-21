@@ -40,4 +40,12 @@ export class CreateProductDto {
   @IsArray()
   @IsString({ each: true })
   colors?: string[];
+
+  @IsOptional()
+  @IsNumber()
+  categoryId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  quantity?: number; // Số lượng sản phẩm
 }

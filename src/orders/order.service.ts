@@ -5,9 +5,11 @@ import { Cart } from 'src/cart/entities/cart.entity';
 import { CartItem } from 'src/cart/entities/cart-item.entity'; // Import CartItem entity
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
+import { Product } from 'src/products/entities/product.entity'; // Import Product entity
 import { ProductsService } from 'src/products/products.service';
 import { VnpayService } from 'src/payment/vnpay.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { ShippingAddress } from '../user/entities/shipping-address.entity.js';
 
 @Injectable()
@@ -23,6 +25,8 @@ export class OrderService {
     private cartItemRepository: Repository<CartItem>,
     @InjectRepository(ShippingAddress)
     private readonly shippingAddressRepo: Repository<ShippingAddress>,
+    @InjectRepository(Product) // Inject Product repository
+    private productRepository: Repository<Product>,
     private readonly vnpayService: VnpayService,
   ) {}
 
@@ -52,7 +56,29 @@ export class OrderService {
       throw new BadRequestException('Không có sản phẩm nào hợp lệ được chọn.');
     }
 
-    // C. Tính tổng tiền & Tạo OrderItems
+    // C. Kiểm tra số lượng sản phẩm trước khi tạo đơn hàng
+    for (const item of selectedItems) {
+      const product = item.product;
+      
+      // Kiểm tra sản phẩm đã bán hết
+      if (product.isSoldOut) {
+        throw new BadRequestException(`Sản phẩm "${product.name}" đã bán hết.`);
+      }
+      
+      // Kiểm tra số lượng còn lại trong kho
+      if (product.quantity === 0) {
+        throw new BadRequestException(`Sản phẩm "${product.name}" đã hết hàng.`);
+      }
+      
+      // Kiểm tra số lượng trong giỏ hàng có vượt quá số lượng trong kho không
+      if (item.quantity > product.quantity) {
+        throw new BadRequestException(
+          `Sản phẩm "${product.name}" chỉ còn ${product.quantity} sản phẩm trong kho. Bạn đang chọn ${item.quantity}.`
+        );
+      }
+    }
+
+    // D. Tính tổng tiền & Tạo OrderItems
     let totalPrice = 0;
     const orderItems: OrderItem[] = [];
 
@@ -138,7 +164,23 @@ export class OrderService {
         order.status = 'COMPLETED';
         await this.orderRepository.save(order);
 
-        // B. XÓA SẢN PHẨM KHỎI GIỎ HÀNG (Logic bạn yêu cầu)
+        // B. GIẢM SỐ LƯỢNG SẢN PHẨM
+        for (const orderItem of order.items) {
+            const product = orderItem.product;
+            if (product) {
+                // Giảm số lượng sản phẩm
+                product.quantity = Math.max(0, product.quantity - orderItem.quantity);
+                
+                // Cập nhật trạng thái bán hết nếu số lượng = 0
+                if (product.quantity === 0) {
+                    product.isSoldOut = true;
+                }
+                
+                await this.productRepository.save(product);
+            }
+        }
+
+        // C. XÓA SẢN PHẨM KHỎI GIỎ HÀNG (Logic bạn yêu cầu)
         // Tìm giỏ hàng của user
         const cart = await this.cartRepository.findOne({
             where: { userId: order.user.id.toString() }, // map userId cho đúng kiểu dữ liệu
@@ -226,6 +268,22 @@ export class OrderService {
     if (order.status === 'PENDING' && rspCode === '00') {
       order.status = 'COMPLETED';
       await this.orderRepository.save(order);
+
+      // Giảm số lượng sản phẩm
+      for (const orderItem of order.items) {
+        const product = orderItem.product;
+        if (product) {
+          // Giảm số lượng sản phẩm
+          product.quantity = Math.max(0, product.quantity - orderItem.quantity);
+          
+          // Cập nhật trạng thái bán hết nếu số lượng = 0
+          if (product.quantity === 0) {
+            product.isSoldOut = true;
+          }
+          
+          await this.productRepository.save(product);
+        }
+      }
 
       // Xóa sản phẩm khỏi giỏ hàng
       const cart = await this.cartRepository.findOne({
@@ -423,4 +481,37 @@ export class OrderService {
       recentOrders,
     };
   }
+
+  // --- 9. CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG (CHO NGƯỜI BÁN) ---
+  async updateOrderStatus(
+    sellerId: number,
+    orderId: number,
+    updateOrderStatusDto: UpdateOrderStatusDto
+  ): Promise<Order> {
+    // Tìm đơn hàng và kiểm tra xem người bán có quyền cập nhật không
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['items', 'items.product', 'user'],
+    });
+
+    if (!order) {
+      throw new NotFoundException('Đơn hàng không tồn tại.');
+    }
+
+    // Kiểm tra xem người bán có sản phẩm trong đơn hàng này không
+    const hasProduct = order.items.some(
+      item => item.product && item.product.userId === String(sellerId)
+    );
+
+    if (!hasProduct) {
+      throw new BadRequestException('Bạn không có quyền cập nhật đơn hàng này.');
+    }
+
+    // Cập nhật trạng thái
+    order.status = updateOrderStatusDto.status;
+    await this.orderRepository.save(order);
+
+    return order;
+  }
 }
+
