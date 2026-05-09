@@ -7,8 +7,7 @@ Hệ thống API backend cho ứng dụng Thương mại điện tử (E-commerc
 - **Cơ sở dữ liệu**: TypeORM (hiện tích hợp SQLite)
 - **Xác thực**: JWT (JSON Web Token) và Passport
 - **Upload & Quản lý ảnh**: Cloudinary
-- **Thanh toán**: Tích hợp cổng thanh toán VNPay (\
-estjs-vnpay\)
+- **Thanh toán**: Tích hợp cổng thanh toán VNPay (`nestjs-vnpay`)
 
 ## 📌 Các chức năng chính
 - **🔒 Authentication & User**: 
@@ -32,26 +31,26 @@ estjs-vnpay\)
 ## 🛠 Cài đặt & Khởi động dự án
 
 ### 1. Tải các gói phụ thuộc
-`ash
+```bash
 npm install
-`
+```
 
 ### 2. Khởi động Server
-`ash
+```bash
 # Chế độ code (tự động reload)
 npm run start:dev
 
 # Build và chạy Production
 npm run build
 npm run start:prod
-`
+```
 
 ## 📜 Cấu trúc thư mục
-- \src/auth\: Logic xác thực JWT.
-- \src/user\: API lấy/sửa thông tin người dùng và sổ địa chỉ.
-- \src/products\ / \src/categories\: Xử lý dữ liệu sản phẩm, phân loại.
-- \src/cart\: Các nghiệp vụ về quản lý giỏ hàng tạm.
-- \src/orders\: Khởi tạo và cập nhật trạng thái đơn hàng.
-- \src/payment\: Dịch vụ tích hợp VNPay.
-- \src/favorites\: Thêm sản phẩm yêu thích (Wishlist).
-- \src/provinces\: Đọc dữ liệu local JSON phục vụ tra cứu Tỉnh/Thành.
+- `src/auth`: Logic xác thực JWT.
+- `src/user`: API lấy/sửa thông tin người dùng và sổ địa chỉ.
+- `src/products` / `src/categories`: Xử lý dữ liệu sản phẩm, phân loại.
+- `src/cart`: Các nghiệp vụ về quản lý giỏ hàng tạm.
+- `src/orders`: Khởi tạo và cập nhật trạng thái đơn hàng.
+- `src/payment`: Dịch vụ tích hợp VNPay.
+- `src/favorites`: Thêm sản phẩm yêu thích (Wishlist).
+- `src/provinces`: Đọc dữ liệu local JSON phục vụ tra cứu Tỉnh/Thành.
